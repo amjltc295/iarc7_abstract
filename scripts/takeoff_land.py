@@ -47,6 +47,9 @@ if __name__ == '__main__':
         # publish and subscribe over ROS.
         rospy.init_node('takeoff_land_abstract')
         takeoff_land()
+        while not rospy.is_shutdown():
+            pass
+
     except Exception, e:
         rospy.logfatal("Error in motion planner while running.")
         rospy.logfatal(str(e))

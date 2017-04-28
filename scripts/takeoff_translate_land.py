@@ -7,7 +7,7 @@ from iarc7_motion.msg import QuadMoveGoal, QuadMoveAction
 from iarc7_safety.SafetyClient import SafetyClient
 
 def takeoff_land():
-    safety_client = SafetyClient('takeoff_land_abstract')
+    safety_client = SafetyClient('takeoff_translate_land_abstract')
     # Since this abstract is top level in the control chain there is no need to check
     # for a safety state. We can also get away with not checking for a fatal state since
     # all nodes below will shut down.

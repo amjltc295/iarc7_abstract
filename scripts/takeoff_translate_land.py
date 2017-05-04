@@ -24,7 +24,7 @@ def takeoff_land():
     rospy.sleep(5.0)
 
     # Test takeoff
-    goal = QuadMoveGoal(movement_type="takeoff", takeoff_height=1.0)
+    goal = QuadMoveGoal(movement_type="takeoff")
     # Sends the goal to the action server.
     client.send_goal(goal)
     # Waits for the server to finish performing the action.

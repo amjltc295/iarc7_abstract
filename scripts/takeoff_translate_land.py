@@ -21,10 +21,10 @@ def takeoff_land():
     # listening for goals.
     client.wait_for_server()
 
-    rospy.sleep(5.0)
+    rospy.sleep(2.0)
 
     # Test takeoff
-    goal = QuadMoveGoal(movement_type="takeoff", takeoff_height=1.0)
+    goal = QuadMoveGoal(movement_type="takeoff")
     # Sends the goal to the action server.
     client.send_goal(goal)
     # Waits for the server to finish performing the action.
@@ -33,11 +33,26 @@ def takeoff_land():
 
     rospy.sleep(2.0)
 
-    # Test translate
-    goal = QuadMoveGoal(movement_type="xyztranslate", x_position=1.0, y_position=5.0, z_position=3.0)
+    # Fly around in square all diagonals when possible.
+    goal = QuadMoveGoal(movement_type="xyztranslate", x_position=4.0, y_position=4.0, z_position=3.0)
     client.send_goal(goal)
     client.wait_for_result()
-    rospy.logwarn("Translate success: {}".format(client.get_result()))
+    rospy.logwarn("Waypoint 1 success: {}".format(client.get_result()))
+
+    goal = QuadMoveGoal(movement_type="xyztranslate", x_position=-4.0, y_position=-4.0, z_position=8.0)
+    client.send_goal(goal)
+    client.wait_for_result()
+    rospy.logwarn("Waypoint 2 success: {}".format(client.get_result()))
+
+    goal = QuadMoveGoal(movement_type="xyztranslate", x_position=4.0, y_position=-4.0, z_position=1.0)
+    client.send_goal(goal)
+    client.wait_for_result()
+    rospy.logwarn("Waypoint 3 success: {}".format(client.get_result()))
+
+    goal = QuadMoveGoal(movement_type="xyztranslate", x_position=-4.0, y_position=4.0, z_position=3.0)
+    client.send_goal(goal)
+    client.wait_for_result()
+    rospy.logwarn("Waypoint 4 success: {}".format(client.get_result()))
 
     # Test land
     goal = QuadMoveGoal(movement_type="land")

@@ -36,7 +36,7 @@ def track_roomba_land():
 
     rospy.sleep(2.0)
 
-    roomba_id = roomba_array.data[2].child_frame_id
+    roomba_id = roomba_array.data[0].child_frame_id
     roomba_id = roomba_id [0:len(roomba_id)-10]
 
     # Test tracking

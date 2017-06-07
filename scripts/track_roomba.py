@@ -36,7 +36,8 @@ def track_roomba_land():
 
     rospy.sleep(2.0)
 
-    roomba_id = roomba_array.data[0].child_frame_id
+    #change element in array to test diff roombas
+    roomba_id = roomba_array.data[3].child_frame_id 
     roomba_id = roomba_id [0:len(roomba_id)-10]
 
     # Test tracking
@@ -56,7 +57,8 @@ if __name__ == '__main__':
         roomba_array = []
         # Initializes a rospy node so that the SimpleActionClient can
         # publish and subscribe over ROS.
-        _roomba_status_sub = rospy.Subscriber('roombas', OdometryArray, _receive_roomba_status)
+        _roomba_status_sub = rospy.Subscriber('roombas', 
+                         OdometryArray, _receive_roomba_status)
 
         rospy.init_node('track_roomba_abstract')
         track_roomba_land()
@@ -68,4 +70,4 @@ if __name__ == '__main__':
         rospy.logfatal(str(e))
         raise
     finally:
-        rospy.signal_shutdown("Takeoff and land abstract shutdown")
+        rospy.signal_shutdown("Takeoff and Track Roomba abstract shutdown")

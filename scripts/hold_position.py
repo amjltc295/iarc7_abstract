@@ -61,10 +61,6 @@ if __name__ == '__main__':
         # publish and subscribe over ROS.
 
         rospy.init_node('hold_position_abstract')
-        
-        roomba_array = []
-        _roomba_status_sub = rospy.Subscriber('roombas', 
-                         OdometryArray, _receive_roomba_status)
 
         _drone_odometry = None
 

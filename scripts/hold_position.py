@@ -38,18 +38,6 @@ def hold_current_position_land():
 
     rospy.sleep(2.0)
 
-     # change element in array to test diff roombas
-    roomba_id = roomba_array.data[3].child_frame_id 
-    roomba_id = roomba_id [0:len(roomba_id)-10]
-
-    # Test tracking
-    goal = QuadMoveGoal(movement_type="track_roomba", frame_id = roomba_id)
-    # Sends the goal to the action server.
-    client.send_goal(goal)
-    # Waits for the server to finish performing the action.
-    client.wait_for_result()
-    rospy.logwarn("Track Roomba success: {}".format(client.get_result()))
-
     _x_position = _drone_odometry.pose.pose.position.x - .25
     _y_position = _drone_odometry.pose.pose.position.y - .25
     _z_position = _drone_odometry.pose.pose.position.z + .1
@@ -62,10 +50,6 @@ def hold_current_position_land():
     rospy.sleep(5)
     client.cancel_goal()
     rospy.logwarn("Hold Position Task canceled")
-
-def _receive_roomba_status(data):
-    global roomba_array
-    roomba_array = data
 
 def _current_velocity_callback(data):
     global _drone_odometry 

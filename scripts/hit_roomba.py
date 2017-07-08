@@ -37,7 +37,7 @@ def hit_roomba_land():
     rospy.sleep(2.0)
 
     # change element in array to test diff roombas
-    roomba_id = roomba_array.data[3].child_frame_id 
+    roomba_id = roomba_array.data[5].child_frame_id 
     roomba_id = roomba_id [0:len(roomba_id)-10]
 
     # Test tracking

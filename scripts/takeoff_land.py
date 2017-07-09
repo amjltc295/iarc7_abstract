@@ -31,7 +31,7 @@ def takeoff_land():
     client.wait_for_result()
     rospy.logwarn("Takeoff success: {}".format(client.get_result()))
 
-    rospy.sleep(2.0)
+    rospy.sleep(5.0)
 
     # Test land
     goal = QuadMoveGoal(movement_type="land")

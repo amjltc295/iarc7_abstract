@@ -53,8 +53,7 @@ if __name__ == '__main__':
     try:
         rospy.init_node('velocity_test_abstract')
         velocity_test()
-        while not rospy.is_shutdown():
-            pass
+        rospy.spin()
 
     except Exception, e:
         rospy.logfatal("Error in motion planner while running.")

@@ -9,7 +9,7 @@ from iarc7_safety.SafetyClient import SafetyClient
 from roomba_controller import RoombaController, RoombaRequests, RoombaControllerStates
 
 def hit_roomba():
-    safety_client = SafetyClient('hit_roomba_abstract')
+    safety_client = SafetyClient('game')
     # Since this abstract is top level in the control chain there is no need to check
     # for a safety state. We can also get away with not checking for a fatal state since
     # all nodes below will shut down.
@@ -35,11 +35,10 @@ def hit_roomba():
 
     # change element in array to test diff roombas
     roomba_id = roomba_array.data[5].child_frame_id 
-    roomba_id = roomba_id [0:len(roomba_id)-10]
 
-    roomba_request = RoombaRequests(roomba_id, True, 5)
+    roomba_request = RoombaRequests(roomba_id, False, 5)
 
-    roomba_controller = RoombaController(roomba_request, client, self._receive_roomba_controller_status)
+    roomba_controller = RoombaController(roomba_request, client, _receive_roomba_controller_status)
 
     roomba_controller.run()
 
@@ -62,7 +61,8 @@ if __name__ == '__main__':
         _roomba_status_sub = rospy.Subscriber('roombas', 
                          OdometryArray, _receive_roomba_status)
 
-        rospy.init_node('game_abstract')
+        rospy.init_node('game')
+        rospy.logwarn("RUNNING")
         hit_roomba()
         while not rospy.is_shutdown():
             pass

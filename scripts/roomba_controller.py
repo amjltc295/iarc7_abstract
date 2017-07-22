@@ -30,7 +30,8 @@ class RoombaController(object):
     def __init__(self, roomba_request, client, status_callback):
         self._status_callback = status_callback
         self._client = client
-        self._frame_id = roomba_request.frame_id
+        roomba_id = roomba_request.frame_id
+        self._roomba_id = roomba_id [0:len(roomba_id)-10]
         self._time_to_hold = roomba_request.time_to_hold
         # True means hit roomba, false means block
         self._mode = roomba_request.mode
@@ -41,13 +42,11 @@ class RoombaController(object):
 
         self._last_goal = None
 
-        self._holding = (self.time_to_hold != 0)
+        self._holding = (self._time_to_hold != 0)
 
         self._state = RoombaControllerStates.tracking
 
-    def _next_goal():
-        goal = None
-
+    def _next_goal(self):
         while self._state != RoombaControllerStates.completed and not rospy.is_shutdown() and not self._end:
 
             # determining goals
@@ -58,13 +57,13 @@ class RoombaController(object):
             elif (self._state == RoombaControllerStates.failed_task):
                 # recover drone first
                 # this is where the height recover goal will be
-                goal = QuadMoveGoal(movement_type="takeoff")
+                goal = QuadMoveGoal(movement_type="height_recovery")
                 # Sends the goal to the action server.
                 self._client.send_goal(goal)
                 # Waits for the server to finish performing the action.
                 self._client.wait_for_result()
 
-                if not client.get_result():
+                if not self._client.get_result():
                      rospy.logerr("Roomba Controller cannot recover drone height")
                      self._state = RoombaControllerStates.failed_recovery
                 
@@ -72,36 +71,36 @@ class RoombaController(object):
 
             elif self._state == RoombaControllerStates.recover_from_success:
                 # this is where the height recover task will be called
-                goal = QuadMoveGoal(movement_type="takeoff")
+                goal = QuadMoveGoal(movement_type="height_recovery")
                 # Sends the goal to the action server.
                 self._client.send_goal(goal)
                 # Waits for the server to finish performing the action.
                 self._client.wait_for_result()
-                rospy.logwarn("Recover Height success: {}".format(client.get_result()))
+                rospy.logwarn("Recover Height success: {}".format(self._client.get_result()))
 
             elif self._state == RoombaControllerStates.tracking:
-                goal = QuadMoveGoal(movement_type="track_roomba", frame_id=roomba_id, mode=self._mode)
+                goal = QuadMoveGoal(movement_type="track_roomba", frame_id=self._roomba_id, mode=self._mode)
                 # Sends the goal to the action server.
                 self._client.send_goal(goal)
                 # Waits for the server to finish performing the action.
                 self._client.wait_for_result()
-                rospy.logwarn("TrackRoomba success: {}".format(client.get_result()))
+                rospy.logwarn("TrackRoomba success: {}".format(self._client.get_result()))
 
             elif self._state == RoombaControllerStates.hit:
-                goal = QuadMoveGoal(movement_type="hit_roomba", frame_id=roomba_id)
+                goal = QuadMoveGoal(movement_type="hit_roomba", frame_id=self._roomba_id)
                 # Sends the goal to the action server.
                 self._client.send_goal(goal)
                 # Waits for the server to finish performing the action.
                 self._client.wait_for_result()
-                rospy.logwarn("HitRoomba success: {}".format(client.get_result()))
+                rospy.logwarn("HitRoomba success: {}".format(self._client.get_result()))
 
             elif self._state == RoombaControllerStates.block:
-                goal = QuadMoveGoal(movement_type="block_roomba", frame_id=roomba_id)
+                goal = QuadMoveGoal(movement_type="block_roomba", frame_id=self._roomba_id)
                 # Sends the goal to the action server.
                 self._client.send_goal(goal)
                 # Waits for the server to finish performing the action.
                 self._client.wait_for_result()
-                rospy.logwarn("BlockRoomba success: {}".format(client.get_result()))
+                rospy.logwarn("BlockRoomba success: {}".format(self._client.get_result()))
 
             elif self._state == RoombaControllerStates.hold_position:
                 goal = QuadMoveGoal(movement_type="hold_position", hold_current_position = True)
@@ -109,7 +108,7 @@ class RoombaController(object):
                 self._client.send_goal(goal)
                 # waits to cancel hold task 
                 rospy.sleep(self._time_to_hold)
-                client.cancel_goal()
+                self._client.cancel_goal()
                 rospy.logwarn("Hold Position Task canceled")
 
             elif self._state == RoombaControllerStates.completed:
@@ -121,7 +120,7 @@ class RoombaController(object):
                 self._state = RoombaControllerStates.invalid_state
             
             # state transitioning
-            if not client.get_result():
+            if not self._client.get_result():
                 if self._state == RoombaControllerStates.failed_task:
                     self._state == RoombaControllerStates.failed_task_and_recovery
                 else:
@@ -129,7 +128,7 @@ class RoombaController(object):
 
             else:
                 if self._state == RoombaControllerStates.tracking:
-                    if self.mode:
+                    if self._mode:
                         self._state = RoombaControllerStates.hit
                     else:
                         self._state = RoombaControllerStates.block

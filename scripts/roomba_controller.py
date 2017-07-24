@@ -9,9 +9,9 @@ from iarc7_motion.msg import QuadMoveGoal, QuadMoveAction
 from iarc7_safety.SafetyClient import SafetyClient
 
 class RoombaRequests(object):
-    def __init__(self, frame_id, mode, time_to_hold_once_done):
+    def __init__(self, frame_id, tracking_mode, time_to_hold_once_done):
         self.frame_id = frame_id
-        self.mode = mode
+        self.tracking_mode = tracking_mode
         self.time_to_hold = time_to_hold_once_done
 
 class RoombaControllerStates(object):
@@ -34,7 +34,7 @@ class RoombaController(object):
         self._roomba_id = roomba_id [0:len(roomba_id)-10]
         self._time_to_hold = roomba_request.time_to_hold
         # True means hit roomba, false means block
-        self._mode = roomba_request.mode
+        self._tracking_mode = roomba_request.tracking_mode
 
         self._is_complete = False
         self._canceled = False
@@ -76,7 +76,7 @@ class RoombaController(object):
                 rospy.logwarn("Recover Height success: {}".format(self._client.get_result()))
 
             elif self._state == RoombaControllerStates.tracking:
-                goal = QuadMoveGoal(movement_type="track_roomba", frame_id=self._roomba_id, mode=self._mode)
+                goal = QuadMoveGoal(movement_type="track_roomba", frame_id=self._roomba_id, tracking_mode=self._tracking_mode)
                 # Sends the goal to the action server.
                 self._client.send_goal(goal)
                 # Waits for the server to finish performing the action.
@@ -126,7 +126,7 @@ class RoombaController(object):
 
             else:
                 if self._state == RoombaControllerStates.tracking:
-                    if self._mode:
+                    if self._tracking_mode:
                         self._state = RoombaControllerStates.hit
                     else:
                         self._state = RoombaControllerStates.block

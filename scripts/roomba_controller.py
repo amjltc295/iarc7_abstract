@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+
 import sys
 import rospy
 from iarc7_msgs.msg import OdometryArray
@@ -45,7 +46,8 @@ class RoombaController(object):
         self._state = RoombaControllerStates.tracking
 
     def _next_goal(self):
-        while self._state != RoombaControllerStates.completed and not rospy.is_shutdown() and not self._end:
+        while (self._state != RoombaControllerStates.completed 
+            and not rospy.is_shutdown() and not self._end):
 
             # determining goals
             if self._canceled:
@@ -76,7 +78,8 @@ class RoombaController(object):
                 rospy.logwarn("Recover Height success: {}".format(self._client.get_result()))
 
             elif self._state == RoombaControllerStates.tracking:
-                goal = QuadMoveGoal(movement_type="track_roomba", frame_id=self._roomba_id, tracking_mode=self._tracking_mode)
+                goal = QuadMoveGoal(movement_type="track_roomba", frame_id=self._roomba_id, 
+                                    tracking_mode=self._tracking_mode)
                 # Sends the goal to the action server.
                 self._client.send_goal(goal)
                 # Waits for the server to finish performing the action.

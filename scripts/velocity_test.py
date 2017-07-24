@@ -34,7 +34,7 @@ def velocity_test():
 
     rospy.sleep(2.0)
 
-    goal = QuadMoveGoal(movement_type="velocity_test")
+    goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=0.3, y_velocity=0.3)
     # Sends the goal to the action server.
     client.send_goal(goal)
     rospy.sleep(5)

@@ -7,8 +7,6 @@ import tf2_ros
 from iarc7_motion.msg import QuadMoveGoal, QuadMoveAction
 from iarc7_safety.SafetyClient import SafetyClient
 
-
-
 def hit_roomba_land():
     safety_client = SafetyClient('hit_roomba_abstract')
     # Since this abstract is top level in the control chain there is no need to check
@@ -41,7 +39,7 @@ def hit_roomba_land():
     roomba_id = roomba_id [0:len(roomba_id)-10]
 
     # Test tracking
-    goal = QuadMoveGoal(movement_type="track_roomba", frame_id = roomba_id)
+    goal = QuadMoveGoal(movement_type="track_roomba", frame_id = roomba_id, tracking_mode=True)
     # Sends the goal to the action server.
     client.send_goal(goal)
     # Waits for the server to finish performing the action.
@@ -55,6 +53,13 @@ def hit_roomba_land():
     # Waits for the server to finish performing the action.
     client.wait_for_result()
     rospy.logwarn("Hit Roomba success: {}".format(client.get_result()))
+
+    goal = QuadMoveGoal(movement_type="height_recovery")
+    # Sends the goal to the action server.
+    client.send_goal(goal)
+    # Waits for the server to finish performing the action.
+    client.wait_for_result()
+    rospy.logwarn("Height Recovery success: {}".format(client.get_result()))
 
 def _receive_roomba_status(data):
     global roomba_array

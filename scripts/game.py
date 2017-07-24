@@ -42,8 +42,16 @@ def hit_roomba():
 
     roomba_controller.run()
 
-    while (controller_state != RoombaControllerStates.completed):
-        pass
+    while (controller_state != RoombaControllerStates.completed
+        and controller_state != RoombaControllerStates.failed_recovery
+        and controller_state != RoombaControllerStates.failed_task):
+        rospy.logwarn(str(controller_state))
+        rospy.sleep(2)
+
+    if controller_state == RoombaControllerStates.completed:
+        rospy.logwarn("Roomba controller completed successfully")
+    else: 
+        rospy.logerr("Roomba controller failed")
 
 def _receive_roomba_status(data):
     global roomba_array
@@ -62,7 +70,6 @@ if __name__ == '__main__':
                          OdometryArray, _receive_roomba_status)
 
         rospy.init_node('game')
-        rospy.logwarn("RUNNING")
         hit_roomba()
         while not rospy.is_shutdown():
             pass

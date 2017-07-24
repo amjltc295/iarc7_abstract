@@ -40,8 +40,6 @@ class RoombaController(object):
         self._canceled = False
         self._end = False
 
-        self._last_goal = None
-
         self._holding = (self._time_to_hold != 0)
 
         self._state = RoombaControllerStates.tracking
@@ -56,7 +54,6 @@ class RoombaController(object):
 
             elif (self._state == RoombaControllerStates.failed_task):
                 # recover drone first
-                # this is where the height recover goal will be
                 goal = QuadMoveGoal(movement_type="height_recovery")
                 # Sends the goal to the action server.
                 self._client.send_goal(goal)
@@ -110,6 +107,7 @@ class RoombaController(object):
                 rospy.sleep(self._time_to_hold)
                 self._client.cancel_goal()
                 rospy.logwarn("Hold Position Task canceled")
+                self._state = RoombaControllerStates.completed
 
             elif self._state == RoombaControllerStates.completed:
                 rospy.logwarn("RoombaController was successful")
@@ -155,6 +153,8 @@ class RoombaController(object):
                     rospy.logerr("Roomba Controller is in an invalid state")
                     self._end = True
                     self._state = RoombaControllerStates.invalid_state
+
+            self._status_callback(self._state)    
 
     def run(self):
         next_thread = threading.Thread(target=self._next_goal)

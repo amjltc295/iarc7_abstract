@@ -34,12 +34,37 @@ def velocity_test():
 
     rospy.sleep(2.0)
 
-    goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=0.3, y_velocity=0.3)
+    goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=0.3, y_velocity=0.0)
     # Sends the goal to the action server.
     client.send_goal(goal)
-    rospy.sleep(5)
+    rospy.sleep(1.0)
     client.cancel_goal()
-    rospy.logwarn("Velocity Test Task canceled")
+    rospy.logwarn("Translation 1 canceled")
+    rospy.sleep(2.0)
+
+    goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=-0.0, y_velocity=-0.3)
+    # Sends the goal to the action server.
+    client.send_goal(goal)
+    rospy.sleep(1.0)
+    client.cancel_goal()
+    rospy.logwarn("Translation 2 canceled")
+    rospy.sleep(2.0)
+
+    goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=-0.3, y_velocity=-0.0)
+    # Sends the goal to the action server.
+    client.send_goal(goal)
+    rospy.sleep(1.0)
+    client.cancel_goal()
+    rospy.logwarn("Translation 3 canceled")
+    rospy.sleep(2.0)
+
+    goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=-0.0, y_velocity=0.3)
+    # Sends the goal to the action server.
+    client.send_goal(goal)
+    rospy.sleep(1.0)
+    client.cancel_goal()
+    rospy.logwarn("Translation 4 canceled")
+    rospy.sleep(2.0)
 
     # Test land
     goal = QuadMoveGoal(movement_type="land")

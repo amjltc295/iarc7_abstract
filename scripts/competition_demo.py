@@ -37,7 +37,7 @@ def competition_demo():
     goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=0.2, y_velocity=-0.2)
     # Sends the goal to the action server.
     client.send_goal(goal)
-    rospy.sleep(0.5)
+    rospy.sleep(3.0)
     client.cancel_goal()
     rospy.logwarn("Translation 1 canceled")
     rospy.sleep(2.0)

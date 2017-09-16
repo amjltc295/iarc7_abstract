@@ -7,8 +7,8 @@ import tf2_ros
 from iarc7_motion.msg import QuadMoveGoal, QuadMoveAction
 from iarc7_safety.SafetyClient import SafetyClient
 
-def velocity_test():
-    safety_client = SafetyClient('velocity_test_abstract')
+def competition_demo():
+    safety_client = SafetyClient('competition_demo_abstract')
     # Since this abstract is top level in the control chain there is no need to check
     # for a safety state. We can also get away with not checking for a fatal state since
     # all nodes below will shut down.
@@ -39,40 +39,40 @@ def velocity_test():
     client.send_goal(goal)
     rospy.sleep(3.0)
     client.cancel_goal()
-    rospy.logwarn("Translation into arena canceled")
+    rospy.logwarn("Translation 1 canceled")
+    rospy.sleep(2.0)
+
+    goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=-0.2, y_velocity=0.2)
+    # Sends the goal to the action server.
+    client.send_goal(goal)
+    rospy.sleep(0.5)
+    client.cancel_goal()
+    rospy.logwarn("Translation 2 canceled")
     rospy.sleep(2.0)
 
     goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=0.3, y_velocity=0.0)
     # Sends the goal to the action server.
     client.send_goal(goal)
-    rospy.sleep(5.0)
-    client.cancel_goal()
-    rospy.logwarn("Translation 1 canceled")
-    rospy.sleep(2.0)
-
-    goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=-0.0, y_velocity=-0.3)
-    # Sends the goal to the action server.
-    client.send_goal(goal)
-    rospy.sleep(5.0)
-    client.cancel_goal()
-    rospy.logwarn("Translation 2 canceled")
-    rospy.sleep(2.0)
-
-    goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=-0.3, y_velocity=-0.0)
-    # Sends the goal to the action server.
-    client.send_goal(goal)
-    rospy.sleep(5.0)
+    rospy.sleep(1.0)
     client.cancel_goal()
     rospy.logwarn("Translation 3 canceled")
     rospy.sleep(2.0)
 
-    goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=-0.0, y_velocity=0.3)
+    goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=-0.2, y_velocity=-0.2)
     # Sends the goal to the action server.
     client.send_goal(goal)
-    rospy.sleep(5.0)
+    rospy.sleep(0.5)
     client.cancel_goal()
     rospy.logwarn("Translation 4 canceled")
     rospy.sleep(2.0)
+
+    goal = QuadMoveGoal(movement_type="velocity_test", x_velocity=0.0, y_velocity=0.3)
+    # Sends the goal to the action server.
+    client.send_goal(goal)
+    rospy.sleep(1.0)
+    client.cancel_goal()
+    rospy.logwarn("Translation 5 canceled")
+    rospy.sleep(6.0)
 
     # Test land
     goal = QuadMoveGoal(movement_type="land")
@@ -84,8 +84,8 @@ def velocity_test():
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('velocity_test_abstract')
-        velocity_test()
+        rospy.init_node('competition_demo_abstract')
+        competition_demo()
         rospy.spin()
 
     except Exception, e:
@@ -93,4 +93,4 @@ if __name__ == '__main__':
         rospy.logfatal(str(e))
         raise
     finally:
-        rospy.signal_shutdown("Velocity Test abstract shutdown")
+        rospy.signal_shutdown("Competition Demo abstract shutdown")

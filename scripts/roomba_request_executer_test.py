@@ -7,10 +7,10 @@ import actionlib
 import tf2_ros
 from iarc7_motion.msg import QuadMoveGoal, QuadMoveAction
 from iarc7_safety.SafetyClient import SafetyClient
-from roomba_controller import RoombaController, RoombaRequests, RoombaControllerStates
+from roomba_request_executer import RoombaRequestExecuter, RoombaRequest, RoombaRequestExecuterState
 
 def hit_roomba():
-    safety_client = SafetyClient('game')
+    safety_client = SafetyClient('roomba_request_executer_test_abstract')
     # Since this abstract is top level in the control chain there is no need to check
     # for a safety state. We can also get away with not checking for a fatal state since
     # all nodes below will shut down.
@@ -34,50 +34,53 @@ def hit_roomba():
     rospy.logwarn("Takeoff success: {}".format(client.get_result()))
     rospy.sleep(2.0)
 
+    while roomba_id is None and not rospy.is_shutdown():
+        rospy.sleep(2)
+        pass
+
     # change element in array to test diff roombas
     roomba_id = roomba_array.data[5].child_frame_id 
 
     roomba_request = RoombaRequests(roomba_id, False, 5)
 
-    roomba_controller = RoombaController(roomba_request, client, _receive_roomba_controller_status)
+    roomba_controller = RoombaRequestExecuter(roomba_request, client, _receive_roomba_executer_status)
 
-    roomba_controller.run()
+    roomba_controller.start()
 
-    while (controller_state != RoombaControllerStates.completed
-        and controller_state != RoombaControllerStates.failed_recovery
-        and controller_state != RoombaControllerStates.failed_task):
-        rospy.logwarn(str(controller_state))
+    while (executer_state != RoombaRequestExecuterStates.COMPLETED
+        and executer_state != RoombaRequestExecuterStates.FAILED_RECOVERY
+        and executer_state != RoombaRequestExecuterStates.FAILED_TASK):
+        rospy.logwarn(str(executer_state))
         rospy.sleep(2)
 
-    if controller_state == RoombaControllerStates.completed:
+    if executer_state == RoombaRequestExecuterStates.completed:
         rospy.logwarn("Roomba controller completed successfully")
     else: 
-        rospy.logerr("Roomba controller failed")
+        rospy.logerr("Roomba request executer failed")
 
 def _receive_roomba_status(data):
     global roomba_array
     roomba_array = data
 
-def _receive_roomba_controller_status(data):
-    global controller_state
-    controller_state = data
+def _receive_roomba_executer_status(data):
+    global executer_state
+    executer_state = data
 
 if __name__ == '__main__':
     try:
-        roomba_array = []
+        roomba_array = None
         # Initializes a rospy node so that the SimpleActionClient can
         # publish and subscribe over ROS.
         _roomba_status_sub = rospy.Subscriber('roombas', 
                          OdometryArray, _receive_roomba_status)
 
-        rospy.init_node('game')
+        rospy.init_node('roomba_request_executer_test_abstract')
         hit_roomba()
-        while not rospy.is_shutdown():
-            pass
+        rospy.spin()
 
     except Exception, e:
         rospy.logfatal("Error in motion planner while running.")
         rospy.logfatal(str(e))
         raise
     finally:
-        rospy.signal_shutdown("Game abstract shutdown")
+        rospy.signal_shutdown("Roomba controller test abstract shutdown")

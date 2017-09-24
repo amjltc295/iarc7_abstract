@@ -10,9 +10,9 @@ from iarc7_motion.msg import QuadMoveGoal, QuadMoveAction
 from iarc7_safety.SafetyClient import SafetyClient
 
 class RoombaRequest(object):
-    def __init__(self, frame_id, TRACKING_mode, time_to_hold_once_done):
+    def __init__(self, frame_id, tracking_mode, time_to_hold_once_done):
         self.frame_id = frame_id
-        self.TRACKING_mode = TRACKING_mode
+        self.tracking_mode = tracking_mode
         self.time_to_hold = time_to_hold_once_done
 
 class RoombaRequestExecuterState(object):
@@ -47,7 +47,7 @@ class RoombaRequestExecuter(object):
         self._time_to_hold = roomba_request.time_to_hold
         
         # True means HIT roomba, false means BLOCK
-        self._TRACKING_mode = roomba_request.TRACKING_mode
+        self._tracking_mode = roomba_request.tracking_mode
 
         self._is_complete = False
         self._canceled = False
@@ -97,7 +97,7 @@ class RoombaRequestExecuter(object):
 
             elif self._state == RoombaRequestExecuterState.TRACKING:
                 goal=QuadMoveGoal(movement_type="track_roomba", frame_id=self._roomba_id, 
-                                    TRACKING_mode=self._TRACKING_mode)
+                                    tracking_mode=self._tracking_mode)
                 # Sends the goal to the action server.
                 self._client.send_goal(goal)
                 # Waits for the server to finish performing the action.
@@ -105,7 +105,7 @@ class RoombaRequestExecuter(object):
                 rospy.logwarn("TrackRoomba success: {}".format(self._client.get_result()))
 
             elif self._state == RoombaRequestExecuterState.HIT:
-                goal=QuadMoveGoal(movement_type="HIT_roomba", frame_id=self._roomba_id)
+                goal=QuadMoveGoal(movement_type="hit_roomba", frame_id=self._roomba_id)
                 # Sends the goal to the action server.
                 self._client.send_goal(goal)
                 # Waits for the server to finish performing the action.
@@ -113,15 +113,15 @@ class RoombaRequestExecuter(object):
                 rospy.logwarn("HITRoomba success: {}".format(self._client.get_result()))
 
             elif self._state == RoombaRequestExecuterState.BLOCK:
-                goal=QuadMoveGoal(movement_type="BLOCK_roomba", frame_id=self._roomba_id)
+                goal=QuadMoveGoal(movement_type="block_roomba", frame_id=self._roomba_id)
                 # Sends the goal to the action server.
                 self._client.send_goal(goal)
                 # Waits for the server to finish performing the action.
                 self._client.wait_for_result()
-                rospy.logwarn("BLOCKRoomba success: {}".format(self._client.get_result()))
+                rospy.logwarn("BlockRoomba success: {}".format(self._client.get_result()))
 
             elif self._state == RoombaRequestExecuterState.HOLD_POSITION:
-                goal=QuadMoveGoal(movement_type="HOLD_POSITION", hold_current_position = True)
+                goal=QuadMoveGoal(movement_type="hold_position", hold_current_position = True)
                 # Sends the goal to the action server.
                 self._client.send_goal(goal)
                 # waits to cancel hold task 
@@ -147,7 +147,7 @@ class RoombaRequestExecuter(object):
 
             else:
                 if self._state == RoombaRequestExecuterState.TRACKING:
-                    if self._TRACKING_mode:
+                    if self._tracking_mode:
                         self._state = RoombaRequestExecuterState.HIT
                     else:
                         self._state = RoombaRequestExecuterState.BLOCK

@@ -34,27 +34,27 @@ def hit_roomba():
     rospy.logwarn("Takeoff success: {}".format(client.get_result()))
     rospy.sleep(2.0)
 
-    while roomba_id is None and not rospy.is_shutdown():
+    while roomba_array is None and not rospy.is_shutdown():
         rospy.sleep(2)
         pass
 
     # change element in array to test diff roombas
     roomba_id = roomba_array.data[5].child_frame_id 
 
-    roomba_request = RoombaRequests(roomba_id, False, 5)
+    roomba_request = RoombaRequest(roomba_id, False, 5)
 
     roomba_controller = RoombaRequestExecuter(roomba_request, client, _receive_roomba_executer_status)
 
     roomba_controller.start()
 
-    while (executer_state != RoombaRequestExecuterStates.COMPLETED
-        and executer_state != RoombaRequestExecuterStates.FAILED_RECOVERY
-        and executer_state != RoombaRequestExecuterStates.FAILED_TASK):
+    while (executer_state != RoombaRequestExecuterState.COMPLETED
+        and executer_state != RoombaRequestExecuterState.FAILED_RECOVERY
+        and executer_state != RoombaRequestExecuterState.FAILED_TASK):
         rospy.logwarn(str(executer_state))
         rospy.sleep(2)
 
-    if executer_state == RoombaRequestExecuterStates.completed:
-        rospy.logwarn("Roomba controller completed successfully")
+    if executer_state == RoombaRequestExecuterState.COMPLETED:
+        rospy.logwarn("Roomba request executer completed successfully")
     else: 
         rospy.logerr("Roomba request executer failed")
 
